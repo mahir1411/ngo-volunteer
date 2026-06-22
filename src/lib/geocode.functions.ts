@@ -11,7 +11,7 @@ export interface GeocodeResult {
 
 /** Server-side proxy to Nominatim. Respects their UA policy. */
 export const geocodeAddress = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => inputSchema.parse(d))
+  .validator((d: unknown) => inputSchema.parse(d))
   .handler(async ({ data }): Promise<GeocodeResult | null> => {
     const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(data.query)}`;
     try {

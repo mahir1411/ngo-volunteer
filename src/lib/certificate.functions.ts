@@ -14,7 +14,7 @@ interface AppRow {
 
 export const issueCertificate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => inputSchema.parse(d))
+  .validator((d: unknown) => inputSchema.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
