@@ -58,7 +58,7 @@ function Applicants() {
       console.log("[CRM] volunteerIds:", volunteerIds);
 
       // 2. Fetch profiles
-      let profilesData = [];
+      let profilesData: any[] = [];
       if (volunteerIds.length > 0) {
         const { data: pData, error: pError } = await supabase
           .from("profiles")
@@ -82,7 +82,7 @@ function Applicants() {
       console.log("[CRM] profilesData:", profilesData);
 
       // 3. Fetch volunteer profiles
-      let volunteerProfilesData = [];
+      let volunteerProfilesData: any[] = [];
       if (volunteerIds.length > 0) {
         const { data: vpData, error: vpError } = await supabase
           .from("volunteer_profiles")

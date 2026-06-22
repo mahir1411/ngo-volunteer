@@ -36,3 +36,6 @@ dist-ssr
 .env.*
 .env.local
 
+# Bun lockfile and config
+bun.lock
+bunfig.toml
