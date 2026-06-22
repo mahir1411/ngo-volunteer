@@ -1,0 +1,207 @@
+# NGO Volunteer Management Portal
+## User Flow Document
+
+**Key decisions applied in this version:**
+- NGOs can publish events **immediately** after signup (no admin pre-approval gate)
+- Volunteer search uses **geo-radius (10km) filtering**, not just exact pincode match
+- **No in-app chat** — NGO and Volunteer contact each other via **visible email/phone**
+- Admin role exists in background only for moderation/reporting, not as a publishing gate
+
+---
+
+## 1. Landing Page Flow
+
+```
+Landing Page
+ ├── "I'm an NGO" → NGO Sign Up
+ ├── "I'm a Volunteer" → Volunteer Sign Up
+ ├── "Browse Events" (public, read-only preview, no filters by location until signed in/pincode entered)
+ └── Login (role auto-detected from account)
+```
+
+---
+
+## 2. NGO Flow
+
+### 2.1 NGO Registration
+
+```
+Click "Register as NGO"
+   │
+   ▼
+Sign Up Form
+ - Org Name, Official Email, Phone, Password
+ - Registration/Trust Number
+ - Upload Registration Certificate (PDF/Image) — stored, shown as "Verification: Pending" badge
+   │
+   ▼
+Email OTP Verification
+   │
+   ▼
+NGO Dashboard unlocked immediately
+ (badge shows "Unverified" until admin reviews docs in background;
+  NGO can publish events right away regardless of badge status)
+```
+
+> Verification badge is informational/trust-building for volunteers, not a publishing gate. Admin can revoke/suspend an NGO later if docs turn out fraudulent — but that's a moderation flow, separate from the happy path.
+
+### 2.2 Create Event Flow
+
+```
+NGO Dashboard → "Create New Event"
+   │
+   ▼
+Event Form
+ - Title, Description, Category
+ - Date/Time, Duration
+ - Address + Pincode (auto-geocoded to lat/lng in background)
+ - Total volunteers needed + role-wise breakdown (e.g. 5 teaching, 3 logistics)
+ - Banner image
+ - Contact for this event: email + phone (auto-filled from org profile, editable)
+   │
+   ▼
+Click "Publish" → Event goes LIVE immediately, instantly searchable
+```
+
+### 2.3 Managing Applications
+
+```
+NGO Dashboard → Event → Applicants Tab
+   │
+   ▼
+List of volunteer applicants (name, skills, distance from event, contact email/phone visible)
+   │
+   ├── Accept → Volunteer notified, slot count decreases
+   ├── Reject → Volunteer notified
+   └── Waitlist → auto-promoted if accepted volunteer cancels
+   │
+   ▼
+Event Day: Mark Attendance (per volunteer)
+   │
+   ▼
+Issue Certificate (auto-generated PDF, downloadable by volunteer)
+```
+
+### 2.4 NGO Dashboard Map
+
+```
+NGO Dashboard
+ ├── Overview (active events, total applicants, upcoming events)
+ ├── My Events (Create / Edit / Cancel / Duplicate)
+ ├── Applications (per event: pending / accepted / rejected / waitlisted)
+ ├── Org Profile (logo, about, causes, registration docs, contact info)
+ ├── Verification Status (read-only, shows pending/verified/rejected)
+ └── Notifications (new applications, cancellations)
+```
+
+---
+
+## 3. Volunteer Flow
+
+### 3.1 Volunteer Registration
+
+```
+Click "Join as Volunteer"
+   │
+   ▼
+Sign Up Form
+ - Name, Email, Phone, Password
+ - Pincode (geocoded to lat/lng for radius search)
+ - Skills/Interests (multi-select)
+ - Availability (weekday/weekend/full-time)
+   │
+   ▼
+Email OTP Verification
+   │
+   ▼
+Volunteer Dashboard unlocked
+```
+
+### 3.2 Discover & Apply Flow
+
+```
+Volunteer Dashboard → "Discover Events"
+   │
+   ▼
+Default view: events within 10km of volunteer's saved pincode
+   │
+   ▼
+Filters available:
+ - Radius slider (e.g. 5km / 10km / 25km / 50km / custom)
+ - Category/Cause
+ - Date range
+ - Skill required
+ - Spots remaining (urgency)
+ - NGO name search
+   │
+   ▼
+List View ←→ Map View toggle
+   │
+   ▼
+Click Event → Event Detail Page
+ - Full description, NGO profile, location map, spots filled (e.g. 12/20)
+ - NGO contact email + phone displayed directly on page
+   │
+   ▼
+Click "Apply"
+ - Optional short message to NGO
+   │
+   ▼
+Application submitted → status "Pending"
+   │
+   ▼
+NGO accepts/rejects → Volunteer notified (email + in-app notification)
+   │
+   ▼
+If accepted: volunteer can contact NGO directly via shown email/phone for coordination
+```
+
+### 3.3 Volunteer Dashboard Map
+
+```
+Volunteer Dashboard
+ ├── Discover Events (filters incl. 10km radius default)
+ ├── My Applications (pending / accepted / rejected / completed)
+ ├── My Impact (hours volunteered, events completed, certificates)
+ ├── Profile (skills, pincode, availability)
+ └── Notifications (status updates, new matching events nearby)
+```
+
+---
+
+## 4. End-to-End Loop (Combined View)
+
+```
+NGO publishes event (live instantly, geocoded location)
+        │
+        ▼
+Volunteer searches within 10km radius of their pincode
+        │
+        ▼
+Volunteer applies (with optional message)
+        │
+        ▼
+NGO sees applicant + their contact email/phone, accepts/rejects
+        │
+        ▼
+Volunteer notified; if accepted, both parties coordinate directly via email/phone
+        │
+        ▼
+Event happens → NGO marks attendance
+        │
+        ▼
+Certificate issued → Volunteer's impact stats updated
+```
+
+---
+
+## 5. Notification Triggers (Both Sides)
+
+| Trigger | Notify |
+|---|---|
+| New volunteer application | NGO |
+| Application accepted/rejected/waitlisted | Volunteer |
+| Event nearing date (reminder) | Both |
+| New event published within volunteer's 10km radius matching their skills | Volunteer |
+| Volunteer cancels application | NGO |
+| Certificate issued | Volunteer |

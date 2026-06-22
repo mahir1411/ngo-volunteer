@@ -1,0 +1,162 @@
+# NGO Volunteer Management Portal
+## Software Requirements Specification (SRS)
+
+---
+
+## 1. Purpose
+
+This document specifies the functional and non-functional requirements for a web-based platform connecting NGOs (who host events and need volunteers) with individuals/students (who want to volunteer). It defines scope, roles, data model, and system behavior to guide design and development.
+
+---
+
+## 2. Scope
+
+The system provides:
+- Self-service NGO registration with **immediate event-publishing rights** (no pre-approval gate)
+- Background NGO document verification that affects only a trust badge, not publishing ability
+- Event creation with location geocoding and volunteer requirement specification
+- Volunteer registration with skill/availability profile
+- Event discovery with **geo-radius filtering (default and adjustable, e.g. 10km)**
+- Application/approval workflow between volunteers and NGOs
+- Direct **email/phone-based communication** (no in-app messaging in scope)
+- Certificates and basic impact tracking
+- Lightweight admin moderation in the background
+
+Out of scope (v1): in-app chat, payments/donations, SMS gateway integration, multi-language support.
+
+---
+
+## 3. User Roles & Permissions
+
+| Role | Permissions |
+|---|---|
+| **NGO** | Register, manage org profile, create/edit/cancel events immediately upon publishing, view & manage applicants, mark attendance, issue certificates |
+| **Volunteer** | Register, manage profile, search/filter events, apply to events, view application status, download certificates |
+| **Admin** (background role) | Review NGO verification docs, flag/suspend fraudulent NGOs or listings, view platform analytics — does **not** gate event publishing |
+
+---
+
+## 4. Functional Requirements
+
+### 4.1 Authentication
+- FR-1: System shall support separate sign-up flows for NGO and Volunteer roles.
+- FR-2: System shall verify email via OTP/link before dashboard access.
+- FR-3: System shall support login with role auto-detection from the account.
+- FR-4: Passwords shall be stored hashed (bcrypt/argon2); never plaintext.
+
+### 4.2 NGO Profile & Verification
+- FR-5: NGO sign-up shall require org name, email, phone, password, registration number, and upload of a registration certificate.
+- FR-6: NGO accounts shall be allowed to publish events **immediately** after email verification, independent of document review status.
+- FR-7: System shall display a verification badge state (`pending` / `verified` / `rejected`) on NGO public profiles based on background admin review.
+- FR-8: Admin shall be able to suspend an NGO account post-hoc if verification fails or fraud is reported; suspension hides their live events but does not retroactively delete history.
+
+### 4.3 Event Management
+- FR-9: NGO shall be able to create an event with: title, description, category, date/time, duration, address, pincode, banner image, total volunteers needed, and role-wise volunteer breakdown.
+- FR-10: System shall geocode the entered address/pincode to latitude/longitude on save, for radius-based search.
+- FR-11: Event shall go live in the public search index immediately upon publish action.
+- FR-12: NGO shall be able to edit or cancel an event; cancellation shall notify all applicants.
+- FR-13: System shall auto-display the NGO's contact email and phone on the event detail page (editable per event if NGO wants a different contact for that event).
+
+### 4.4 Volunteer Profile
+- FR-14: Volunteer sign-up shall require name, email, phone, password, pincode, skills/interests (multi-select), and availability.
+- FR-15: System shall geocode the volunteer's pincode to lat/lng for radius search and store it as their default search origin.
+- FR-16: Volunteer shall be able to update pincode/skills/availability at any time; updated location shall immediately re-center their default search radius.
+
+### 4.5 Search & Filtering
+- FR-17: System shall default to showing events within a **10km radius** of the volunteer's saved location.
+- FR-18: Volunteer shall be able to adjust the radius (e.g., 5/10/25/50km or custom slider).
+- FR-19: System shall support combinable filters: radius, category, date range, skill required, spots remaining, NGO name.
+- FR-20: System shall support both list view and map view of filtered results.
+- FR-21: Radius search shall use stored lat/lng (haversine distance or DB geo-query, e.g., PostGIS `ST_DWithin`), not string-matching of pincode digits.
+
+### 4.6 Application Workflow
+- FR-22: Volunteer shall be able to apply to an event with an optional message.
+- FR-23: System shall decrement available spots only upon NGO acceptance, not on application submission.
+- FR-24: NGO shall be able to Accept / Reject / Waitlist each applicant.
+- FR-25: Waitlisted volunteers shall be auto-notified and offered the spot if an accepted volunteer cancels.
+- FR-26: Volunteer shall be able to cancel their own application before the event date; NGO shall be notified.
+
+### 4.7 Communication
+- FR-27: System shall display NGO email and phone to any volunteer who has applied (or per NGO setting, to all viewers of the event).
+- FR-28: System shall display volunteer email and phone to the NGO once an application is submitted.
+- FR-29: No in-app messaging/chat shall be built in v1; all coordination happens off-platform via shown contact details.
+
+### 4.8 Post-Event
+- FR-30: NGO shall be able to mark attendance per accepted volunteer after the event date.
+- FR-31: System shall auto-generate a downloadable PDF certificate for volunteers marked as attended.
+- FR-32: System shall update volunteer's cumulative impact stats (events completed, hours logged) after attendance is marked.
+
+### 4.9 Notifications
+- FR-33: System shall send email + in-app notifications for: new application (→NGO), application status change (→volunteer), event cancellation (→applicants), upcoming event reminder (→both), new matching event within radius (→volunteer), certificate issued (→volunteer).
+
+### 4.10 Admin (Background Moderation)
+- FR-34: Admin shall have a queue of NGO verification documents to approve/reject (affects badge only).
+- FR-35: Admin shall be able to view reported events/NGOs and take down listings violating policy.
+- FR-36: Admin shall have access to platform-level analytics (active NGOs, active volunteers, events published, applications processed).
+
+---
+
+## 5. Non-Functional Requirements
+
+| Category | Requirement |
+|---|---|
+| **Performance** | Event search with radius filter shall return results in <1.5s for up to ~50,000 events |
+| **Scalability** | Geo queries shall use indexed geo-columns (e.g. PostGIS GIST index) to remain performant as data grows |
+| **Security** | All traffic over HTTPS; passwords hashed; uploaded documents access-restricted to admin + owning NGO |
+| **Availability** | Target 99.5% uptime for core browse/apply flows |
+| **Data Privacy** | Volunteer/NGO contact info (email/phone) only exposed per the rules in FR-27/28, not in public scraping-friendly form (e.g., obscure in public listing pages until application step, if desired later) |
+| **Usability** | Mobile-responsive; filters usable on small screens; map view degrades gracefully to list-only on low bandwidth |
+| **Auditability** | All event publish/edit/cancel actions and application status changes shall be timestamped and logged |
+
+---
+
+## 6. Data Model (Entities)
+
+**Users** — id, email, password_hash, role, phone, status, created_at
+
+**NGO_Profiles** — user_id, org_name, registration_number, verification_doc_url, verification_status (pending/verified/rejected), about, logo_url, causes[], contact_email, contact_phone
+
+**Volunteer_Profiles** — user_id, name, pincode, lat, lng, skills[], availability, impact_hours, events_completed
+
+**Events** — id, ngo_id, title, description, category, banner_url, address, pincode, lat, lng, start_date, end_date, status (published/cancelled/completed), total_volunteers_needed, contact_email, contact_phone
+
+**Event_Roles** — id, event_id, role_name, count_needed, count_filled
+
+**Applications** — id, event_id, volunteer_id, status (pending/accepted/rejected/waitlisted/cancelled), message, applied_at
+
+**Attendance** — id, application_id, attended (bool), hours_logged
+
+**Certificates** — id, volunteer_id, event_id, issued_at, file_url
+
+**Notifications** — id, user_id, type, message, read (bool), created_at
+
+**Admin_Reports** — id, reported_entity_type (ngo/event), reported_entity_id, reason, status, created_at
+
+---
+
+## 7. External Integrations
+
+| Need | Suggested Integration |
+|---|---|
+| Geocoding pincode → lat/lng | Google Geocoding API / India Post Pincode API |
+| Radius search | PostgreSQL + PostGIS (`ST_DWithin`) or MongoDB `$geoNear` |
+| Email notifications | SendGrid / AWS SES |
+| File storage (docs, banners, certificates) | AWS S3 / Cloudinary |
+| Certificate PDF generation | `pdf-lib` / `Puppeteer` (HTML→PDF) on backend |
+
+---
+
+## 8. Acceptance Criteria (Sample)
+
+- AC-1: Given a verified or unverified NGO completes signup and email verification, when they submit the event creation form, the event must appear in volunteer search results within seconds, regardless of document verification status.
+- AC-2: Given a volunteer's saved pincode, when they open Discover Events with default settings, only events within 10km shall be shown, sorted by distance ascending unless re-sorted.
+- AC-3: Given a volunteer applies to an event, when the NGO views the applicant list, the volunteer's email and phone must be visible without any extra click.
+- AC-4: Given an NGO marks a volunteer as attended, when the action is saved, a certificate PDF must be generated and visible in the volunteer's dashboard within a reasonable time (e.g., <30s if async).
+
+---
+
+## 9. Phased Delivery
+
+**Phase 1 (MVP):** Auth, profiles, event CRUD with geocoding, 10km radius search, apply/accept/reject, email/phone visibility, basic notifications.
+
+**Phase 2:** Certificates & impact stats, waitlist auto-promotion, admin moderation panel, analytics dashboards, badges/gamification.
