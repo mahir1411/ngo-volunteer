@@ -47,6 +47,7 @@ export const issueCertificate = createServerFn({ method: "POST" })
     const font = await pdf.embedFont(StandardFonts.HelveticaBold);
     const body = await pdf.embedFont(StandardFonts.Helvetica);
     const teal = rgb(0.06, 0.46, 0.45);
+    const goldColor = rgb(0.83, 0.69, 0.22); // Premium Gold color
     const ink = rgb(0.13, 0.16, 0.22);
 
     page.drawRectangle({
@@ -54,7 +55,7 @@ export const issueCertificate = createServerFn({ method: "POST" })
       y: 24,
       width: 744,
       height: 564,
-      borderColor: teal,
+      borderColor: goldColor,
       borderWidth: 3,
     });
     page.drawRectangle({
@@ -62,44 +63,32 @@ export const issueCertificate = createServerFn({ method: "POST" })
       y: 36,
       width: 720,
       height: 540,
-      borderColor: teal,
+      borderColor: goldColor,
       borderWidth: 1,
     });
 
-    page.drawText("Certificate of Volunteer Service", {
-      x: 130,
-      y: 480,
-      size: 32,
-      font,
-      color: teal,
-    });
-    page.drawText("This certificate is proudly presented to", {
-      x: 230,
-      y: 420,
-      size: 14,
-      font: body,
-      color: ink,
-    });
+    const drawCenteredText = (text: string, y: number, size: number, textFont: typeof font, color: typeof ink) => {
+      const textWidth = textFont.widthOfTextAtSize(text, size);
+      page.drawText(text, {
+        x: 396 - textWidth / 2,
+        y,
+        size,
+        font: textFont,
+        color,
+      });
+    };
+
+    drawCenteredText("Certificate of Volunteer Service", 470, 32, font, teal);
+    drawCenteredText("This certificate is proudly presented to", 410, 14, body, ink);
+    
     const name = vol?.full_name || "Volunteer";
-    page.drawText(name, { x: 396 - name.length * 6, y: 372, size: 28, font, color: ink });
+    drawCenteredText(name, 360, 28, font, ink);
     const eventTitle = app.events?.title || "";
     const eventDate = new Date(app.events?.starts_at || Date.now()).toDateString();
     const hours = app.attendance?.hours ?? 0;
 
-    page.drawText(`for volunteering at "${eventTitle}"`, {
-      x: 220,
-      y: 320,
-      size: 14,
-      font: body,
-      color: ink,
-    });
-    page.drawText(`on ${eventDate}  -  ${hours} hours contributed`, {
-      x: 240,
-      y: 296,
-      size: 12,
-      font: body,
-      color: ink,
-    });
+    drawCenteredText(`for volunteering at "${eventTitle}"`, 305, 14, body, ink);
+    drawCenteredText(`on ${eventDate}  -  ${hours} hours contributed`, 275, 12, body, ink);
 
     page.drawText(`Issued by ${ngo?.org_name || "Organization"}`, {
       x: 60,

@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { Check, X, Clock, Award, Mail, Phone, ArrowLeft, Users } from "lucide-react";
+import { Check, X, Clock, Award, Mail, Phone, ArrowLeft, Users, FileSpreadsheet, FileDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -155,6 +155,242 @@ function Applicants() {
 
   const selectedApp = apps.find((a: any) => a.id === selectedAppId);
   const acceptedApps = apps.filter((a: any) => a.status === "accepted");
+
+  const downloadExcel = () => {
+    try {
+      const headers = ["Volunteer Name", "Email", "Phone", "Role", "Status", "Hours Logged"];
+      const rows = acceptedApps.map((a: any) => {
+        const att = Array.isArray(a.attendance) ? a.attendance[0] : a.attendance;
+        return [
+          a.profiles?.full_name || "N/A",
+          a.profiles?.email || "N/A",
+          a.profiles?.phone || "N/A",
+          a.event_roles?.role_name || "General Volunteer",
+          att?.attended ? "Present" : "Absent",
+          att?.hours ?? 0,
+        ];
+      });
+
+      const csvContent = [
+        headers.map((h) => `"${h.replace(/"/g, '""')}"`).join(","),
+        ...rows.map((row) => row.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(",")),
+      ].join("\n");
+
+      const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `${ev?.title || "event"}_attendance_${format(new Date(), "yyyy-MM-dd")}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success("Excel sheet (CSV) downloaded successfully");
+    } catch (error) {
+      console.error("CSV generation error:", error);
+      toast.error("Failed to generate Excel sheet");
+    }
+  };
+
+  const downloadPdf = async () => {
+    try {
+      const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
+      const pdfDoc = await PDFDocument.create();
+
+      const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+      const pageWidth = 595; // A4 width
+      const pageHeight = 842; // A4 height
+      const margin = 40;
+      const contentWidth = pageWidth - margin * 2; // 515
+
+      let page = pdfDoc.addPage([pageWidth, pageHeight]);
+      let currentY = pageHeight - margin;
+
+      const tealColor = rgb(0.06, 0.46, 0.45);
+      const charcoalColor = rgb(0.13, 0.16, 0.22);
+      const white = rgb(1, 1, 1);
+      const lightGray = rgb(0.95, 0.95, 0.95);
+      const borderGray = rgb(0.85, 0.85, 0.85);
+
+      // Title Banner
+      page.drawRectangle({
+        x: margin,
+        y: currentY - 60,
+        width: contentWidth,
+        height: 60,
+        color: tealColor,
+      });
+
+      page.drawText("EVENT ATTENDANCE REPORT", {
+        x: margin + 15,
+        y: currentY - 35,
+        size: 16,
+        font: fontBold,
+        color: white,
+      });
+
+      const formattedDate = format(new Date(), "PPpp");
+      page.drawText(`Generated on: ${formattedDate}`, {
+        x: margin + 15,
+        y: currentY - 50,
+        size: 8,
+        font: fontRegular,
+        color: white,
+      });
+
+      currentY -= 80;
+
+      // Event Info Box
+      page.drawRectangle({
+        x: margin,
+        y: currentY - 65,
+        width: contentWidth,
+        height: 65,
+        color: lightGray,
+        borderColor: borderGray,
+        borderWidth: 1,
+      });
+
+      page.drawText(`Event: ${ev?.title || "N/A"}`, {
+        x: margin + 15,
+        y: currentY - 18,
+        size: 11,
+        font: fontBold,
+        color: charcoalColor,
+      });
+
+      const eventTime = ev?.starts_at
+        ? `${format(new Date(ev.starts_at), "PPp")}`
+        : "N/A";
+      page.drawText(`Date & Time: ${eventTime}`, {
+        x: margin + 15,
+        y: currentY - 34,
+        size: 9,
+        font: fontRegular,
+        color: charcoalColor,
+      });
+
+      const presentCount = acceptedApps.filter((a: any) => {
+        const att = Array.isArray(a.attendance) ? a.attendance[0] : a.attendance;
+        return att?.attended;
+      }).length;
+      const totalCount = acceptedApps.length;
+
+      page.drawText(
+        `Total Volunteers: ${totalCount}   |   Present: ${presentCount}   |   Absent: ${totalCount - presentCount}`,
+        {
+          x: margin + 15,
+          y: currentY - 50,
+          size: 9,
+          font: fontBold,
+          color: tealColor,
+        },
+      );
+
+      currentY -= 90;
+
+      // Table configuration
+      const colWidths = [150, 150, 100, 65, 50]; // Total: 515
+      const headers = ["Volunteer Name", "Email", "Role", "Status", "Hours"];
+
+      const drawRow = (
+        rowPage: typeof page,
+        y: number,
+        data: string[],
+        isHeader = false,
+      ) => {
+        if (isHeader) {
+          rowPage.drawRectangle({
+            x: margin,
+            y: y - 18,
+            width: contentWidth,
+            height: 18,
+            color: tealColor,
+          });
+        } else {
+          rowPage.drawRectangle({
+            x: margin,
+            y: y - 18,
+            width: contentWidth,
+            height: 18,
+            color: lightGray,
+            borderColor: borderGray,
+            borderWidth: 0.5,
+          });
+        }
+
+        let xOffset = margin;
+        for (let i = 0; i < data.length; i++) {
+          const text = String(data[i]);
+          const font = isHeader ? fontBold : fontRegular;
+          const color = isHeader ? white : charcoalColor;
+          const size = isHeader ? 8.5 : 8;
+
+          let truncated = text;
+          while (
+            truncated.length > 0 &&
+            font.widthOfTextAtSize(truncated, size) > colWidths[i] - 10
+          ) {
+            truncated = truncated.slice(0, -1);
+          }
+          if (truncated.length < text.length) {
+            truncated = truncated + "...";
+          }
+
+          rowPage.drawText(truncated, {
+            x: xOffset + 5,
+            y: y - 12,
+            size,
+            font,
+            color,
+          });
+          xOffset += colWidths[i];
+        }
+      };
+
+      // Draw table headers
+      drawRow(page, currentY, headers, true);
+      currentY -= 18;
+
+      // Draw rows
+      for (let index = 0; index < acceptedApps.length; index++) {
+        const a = acceptedApps[index];
+
+        if (currentY - 20 < margin) {
+          page = pdfDoc.addPage([pageWidth, pageHeight]);
+          currentY = pageHeight - margin;
+          drawRow(page, currentY, headers, true);
+          currentY -= 18;
+        }
+
+        const att = Array.isArray(a.attendance) ? a.attendance[0] : a.attendance;
+        const name = a.profiles?.full_name || "Volunteer";
+        const email = a.profiles?.email || "N/A";
+        const role = a.event_roles?.role_name || "Volunteer";
+        const status = att?.attended ? "Present" : "Absent";
+        const hours = String(att?.hours ?? 0);
+
+        drawRow(page, currentY, [name, email, role, status, hours], false);
+        currentY -= 18;
+      }
+
+      const pdfBytes = await pdfDoc.save();
+      const blob = new Blob([pdfBytes as any], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${ev?.title || "event"}_attendance_${format(new Date(), "yyyy-MM-dd")}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success("PDF Downloaded successfully");
+    } catch (error) {
+      console.error("PDF generation error:", error);
+      toast.error("Failed to generate PDF");
+    }
+  };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
@@ -445,24 +681,50 @@ function Applicants() {
               </p>
             </div>
           ) : (
-            <div className="border border-border/40 rounded-2xl bg-card overflow-hidden shadow-xs">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-border/40 bg-secondary/35 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      <th className="px-6 py-4">Volunteer</th>
-                      <th className="px-6 py-4">Role</th>
-                      <th className="px-6 py-4">Attendance</th>
-                      <th className="px-6 py-4">Hours Logged</th>
-                      <th className="px-6 py-4 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/25 text-sm">
-                    {acceptedApps.map((a: any) => (
-                      <AttendanceTableRow key={a.id} a={a} refetch={refetch} issue={issue} />
-                    ))}
-                  </tbody>
-                </table>
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card p-5 border border-border/40 rounded-2xl shadow-xs transition-all duration-300 hover:shadow-md">
+                <div>
+                  <h3 className="font-display font-bold text-foreground text-sm sm:text-base">Attendance Sheet & Statistics</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">Download the attendance log for external record-keeping or reporting.</p>
+                </div>
+                <div className="flex items-center gap-2.5 w-full sm:w-auto shrink-0">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={downloadExcel} 
+                    className="flex-1 sm:flex-initial rounded-xl font-semibold text-xs py-2 px-4 border border-border/60 hover:bg-secondary/40 hover:text-foreground cursor-pointer transition-all duration-200"
+                  >
+                    <FileSpreadsheet className="mr-1.5 h-4 w-4 text-emerald-600 dark:text-emerald-500" /> Export Excel
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={downloadPdf} 
+                    className="flex-1 sm:flex-initial rounded-xl font-semibold text-xs py-2 px-4 border border-border/60 hover:bg-secondary/40 hover:text-foreground cursor-pointer transition-all duration-200"
+                  >
+                    <FileDown className="mr-1.5 h-4 w-4 text-teal-600 dark:text-teal-500" /> Export PDF
+                  </Button>
+                </div>
+              </div>
+              <div className="border border-border/40 rounded-2xl bg-card overflow-hidden shadow-xs">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-border/40 bg-secondary/35 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                        <th className="px-6 py-4">Volunteer</th>
+                        <th className="px-6 py-4">Role</th>
+                        <th className="px-6 py-4">Attendance</th>
+                        <th className="px-6 py-4">Hours Logged</th>
+                        <th className="px-6 py-4 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/25 text-sm">
+                      {acceptedApps.map((a: any) => (
+                        <AttendanceTableRow key={a.id} a={a} refetch={refetch} issue={issue} ev={ev} />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
@@ -472,9 +734,12 @@ function Applicants() {
   );
 }
 
-function AttendanceTableRow({ a, refetch, issue }: any) {
-  const [attended, setAttended] = useState(a.attendance?.attended ?? false);
-  const [hours, setHours] = useState(a.attendance?.hours ?? 0);
+function AttendanceTableRow({ a, refetch, issue, ev }: any) {
+  const attData = Array.isArray(a.attendance) ? a.attendance[0] : a.attendance;
+  const certData = Array.isArray(a.certificates) ? a.certificates[0] : a.certificates;
+
+  const [attended, setAttended] = useState(attData?.attended ?? false);
+  const [hours, setHours] = useState(attData?.hours ?? 0);
   const [busy, setBusy] = useState(false);
 
   const save = async () => {
@@ -490,16 +755,182 @@ function AttendanceTableRow({ a, refetch, issue }: any) {
     }
   };
 
-  const cert = async () => {
+  const downloadExistingCert = async () => {
+    const certPath = certData?.pdf_url;
+    if (!certPath) return;
     try {
       setBusy(true);
-      await issue({ data: { application_id: a.id } });
-      toast.success("Certificate issued");
-      refetch();
+      const { data: urlData } = supabase.storage.from("certificates").getPublicUrl(certPath);
+      if (urlData?.publicUrl) {
+        try {
+          const fileRes = await fetch(urlData.publicUrl);
+          const blob = await fileRes.blob();
+          const blobUrl = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = blobUrl;
+          link.download = `certificate_${a.profiles?.full_name || "volunteer"}.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(blobUrl);
+          toast.success("Certificate downloaded successfully");
+        } catch (err) {
+          window.open(urlData.publicUrl, "_blank");
+        }
+      }
     } catch (e: any) {
-      toast.error(e.message || "Failed to issue certificate");
+      toast.error("Failed to download certificate");
+    } finally {
+      setBusy(false);
     }
-    setBusy(false);
+  };
+
+  const generateCertificateClientSide = async () => {
+    try {
+      const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
+      const pdf = await PDFDocument.create();
+      const page = pdf.addPage([792, 612]);
+      const font = await pdf.embedFont(StandardFonts.HelveticaBold);
+      const body = await pdf.embedFont(StandardFonts.Helvetica);
+      const teal = rgb(0.06, 0.46, 0.45);
+      const goldColor = rgb(0.83, 0.69, 0.22); // Premium Gold color
+      const ink = rgb(0.13, 0.16, 0.22);
+
+      page.drawRectangle({
+        x: 24,
+        y: 24,
+        width: 744,
+        height: 564,
+        borderColor: goldColor,
+        borderWidth: 3,
+      });
+      page.drawRectangle({
+        x: 36,
+        y: 36,
+        width: 720,
+        height: 540,
+        borderColor: goldColor,
+        borderWidth: 1,
+      });
+
+      const drawCenteredText = (text: string, y: number, size: number, textFont: any, color: any) => {
+        const textWidth = textFont.widthOfTextAtSize(text, size);
+        page.drawText(text, {
+          x: 396 - textWidth / 2,
+          y,
+          size,
+          font: textFont,
+          color,
+        });
+      };
+
+      drawCenteredText("Certificate of Volunteer Service", 470, 32, font, teal);
+      drawCenteredText("This certificate is proudly presented to", 410, 14, body, ink);
+      
+      const name = a.profiles?.full_name || "Volunteer";
+      drawCenteredText(name, 360, 28, font, ink);
+
+      const eventTitle = ev?.title || "";
+      const eventDate = new Date(ev?.starts_at || Date.now()).toDateString();
+
+      drawCenteredText(`for volunteering at "${eventTitle}"`, 305, 14, body, ink);
+      drawCenteredText(`on ${eventDate}  -  ${hours} hours contributed`, 275, 12, body, ink);
+
+      // Try fetching NGO org_name
+      let orgName = "Organization";
+      try {
+        const { data: ngoData } = await supabase
+          .from("ngo_profiles")
+          .select("org_name")
+          .eq("user_id", ev?.ngo_id)
+          .single();
+        if (ngoData?.org_name) {
+          orgName = ngoData.org_name;
+        }
+      } catch (e) {
+        console.warn("Failed to fetch NGO name:", e);
+      }
+
+      page.drawText(`Issued by ${orgName}`, {
+        x: 60,
+        y: 80,
+        size: 11,
+        font: body,
+        color: ink,
+      });
+      page.drawText(`VolunteerConnect  -  ${new Date().toDateString()}`, {
+        x: 520,
+        y: 80,
+        size: 10,
+        font: body,
+        color: ink,
+      });
+
+      const pdfBytes = await pdf.save();
+      const blob = new Blob([pdfBytes as any], { type: "application/pdf" });
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = `certificate_${name.replace(/\s+/g, "_")}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+
+      toast.success("Certificate generated and downloaded locally!");
+    } catch (err: any) {
+      console.error("Client-side certificate generation failed:", err);
+      toast.error("Failed to generate certificate locally");
+    }
+  };
+
+  const cert = async () => {
+    if (!attended) {
+      toast.error("Volunteer must be marked as present to issue a certificate");
+      return;
+    }
+    try {
+      setBusy(true);
+      // Auto-save the present state before issuing
+      const { error: saveError } = await supabase
+        .from("attendance")
+        .upsert({ application_id: a.id, attended, hours });
+      if (saveError) throw saveError;
+
+      const res = await issue({ data: { application_id: a.id } });
+      toast.success("Certificate issued successfully");
+      refetch();
+
+      if (res && res.path) {
+        const { data: urlData } = supabase.storage.from("certificates").getPublicUrl(res.path);
+        if (urlData?.publicUrl) {
+          try {
+            const fileRes = await fetch(urlData.publicUrl);
+            const blob = await fileRes.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = blobUrl;
+            link.download = `certificate_${a.profiles?.full_name || "volunteer"}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(blobUrl);
+          } catch (err) {
+            window.open(urlData.publicUrl, "_blank");
+          }
+        }
+      }
+    } catch (e: any) {
+      if (e.message?.includes("SUPABASE_SERVICE_ROLE_KEY")) {
+        console.warn("Database service role key missing. Falling back to client-side generation.");
+        toast.info("Database service key not configured. Generating certificate client-side...");
+        await generateCertificateClientSide();
+      } else {
+        toast.error(e.message || "Failed to issue certificate");
+      }
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -553,11 +984,17 @@ function AttendanceTableRow({ a, refetch, issue }: any) {
           >
             Save
           </Button>
-          {a.certificates?.id ? (
-            <Badge className="rounded-full bg-emerald-500/10 text-emerald-500 border-none font-bold text-xs py-1">
+          {certData?.id ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={downloadExistingCert}
+              disabled={busy}
+              className="rounded-lg text-xs h-8 border-emerald-500/30 text-emerald-600 dark:text-emerald-500 hover:bg-emerald-500/10 cursor-pointer font-semibold"
+            >
               <Award className="mr-1 h-3.5 w-3.5" />
-              Certified
-            </Badge>
+              Download Cert
+            </Button>
           ) : (
             <Button
               size="sm"
