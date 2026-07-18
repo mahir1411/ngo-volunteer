@@ -42,3 +42,6 @@ bunfig.toml
 
 # Netlify folder
 .netlify/
+
+# Vercel folder
+.vercel/
