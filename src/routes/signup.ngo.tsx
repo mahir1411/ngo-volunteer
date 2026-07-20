@@ -12,8 +12,8 @@ import { Heart } from "lucide-react";
 export const Route = createFileRoute("/signup/ngo")({
   head: () => ({
     meta: [
-      { title: "NGO sign up — VolunteerConnect" },
-      { name: "description", content: "Register your nonprofit on VolunteerConnect." },
+      { title: "NGO sign up — KindLink" },
+      { name: "description", content: "Register your nonprofit on KindLink." },
     ],
   }),
   component: SignupNgo,
@@ -127,7 +127,7 @@ function SignupNgo() {
               <Heart className="h-4.5 w-4.5" fill="currentColor" />
             </div>
             <span className="font-display font-bold text-lg tracking-tight text-foreground">
-              VolunteerConnect
+              KindLink
             </span>
           </Link>
         </div>
@@ -177,7 +177,7 @@ function SignupNgo() {
         {/* Quote */}
         <div className="relative z-10 mt-auto pt-6 border-t border-border/40">
           <p className="text-sm italic text-muted-foreground">
-            "VolunteerConnect transformed how we coordinate our food drives. We had 20 eager
+            "KindLink transformed how we coordinate our food drives. We had 20 eager
             volunteers registered and ready within 48 hours of posting."
           </p>
           <p className="text-xs font-semibold tracking-wider uppercase mt-2 text-muted-foreground/80">
@@ -193,7 +193,7 @@ function SignupNgo() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
               <Heart className="h-5 w-5" fill="currentColor" />
             </div>
-            <span className="font-display font-bold text-xl tracking-tight">VolunteerConnect</span>
+            <span className="font-display font-bold text-xl tracking-tight">KindLink</span>
           </div>
 
           <div className="space-y-2 mb-8">

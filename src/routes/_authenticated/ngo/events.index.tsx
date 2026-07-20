@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_authenticated/ngo/events/")({
-  head: () => ({ meta: [{ title: "My events — VolunteerConnect" }] }),
+  head: () => ({ meta: [{ title: "My events — KindLink" }] }),
   component: NgoEvents,
 });
 

@@ -6,8 +6,8 @@ import { EventCard, type EventLite } from "@/components/EventCard";
 export const Route = createFileRoute("/browse")({
   head: () => ({
     meta: [
-      { title: "Browse volunteer events — VolunteerConnect" },
-      { name: "description", content: "Browse the latest volunteer opportunities from NGOs." },
+      { title: "Browse volunteer events — KindLink" },
+      { name: "description", content: "Explore upcoming NGO events looking for volunteers." },
     ],
   }),
   component: Browse,

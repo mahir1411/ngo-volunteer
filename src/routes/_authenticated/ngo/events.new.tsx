@@ -28,7 +28,7 @@ const CATEGORIES = [
 ];
 
 export const Route = createFileRoute("/_authenticated/ngo/events/new")({
-  head: () => ({ meta: [{ title: "Create event — VolunteerConnect" }] }),
+  head: () => ({ meta: [{ title: "Create event — KindLink" }] }),
   component: NewEvent,
 });
 

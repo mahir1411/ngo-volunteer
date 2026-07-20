@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const Route = createFileRoute("/_authenticated/volunteer/profile")({
-  head: () => ({ meta: [{ title: "My profile — VolunteerConnect" }] }),
+  head: () => ({ meta: [{ title: "My profile — KindLink" }] }),
   component: VProfile,
 });
 

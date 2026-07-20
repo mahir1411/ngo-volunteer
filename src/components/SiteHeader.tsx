@@ -58,7 +58,7 @@ export function SiteHeader() {
               <Heart className="h-4 w-4 fill-current text-current" />
             </div>
             <span className="font-display text-sm font-black tracking-tight text-foreground select-none hidden sm:inline-block">
-              Volunteer<span className="text-muted-foreground font-medium">Connect</span>
+              Kind<span className="text-muted-foreground font-medium">Link</span>
               <span className="text-primary font-black">.</span>
             </span>
           </Link>

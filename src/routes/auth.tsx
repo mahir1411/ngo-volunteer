@@ -11,8 +11,8 @@ import { Heart } from "lucide-react";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Log in — VolunteerConnect" },
-      { name: "description", content: "Log in to VolunteerConnect." },
+      { title: "Log in — KindLink" },
+      { name: "description", content: "Log in to KindLink." },
     ],
   }),
   component: AuthPage,
@@ -47,7 +47,7 @@ function AuthPage() {
             <Heart className="h-4.5 w-4.5" fill="currentColor" />
           </div>
           <span className="font-display font-bold text-lg tracking-tight text-foreground">
-            VolunteerConnect
+            KindLink
           </span>
         </div>
 
@@ -78,7 +78,7 @@ function AuthPage() {
         <div className="relative z-10 mt-auto pt-6 border-t border-border/40">
           <blockquote className="space-y-2">
             <p className="text-sm italic text-muted-foreground">
-              "VolunteerConnect made it incredibly easy to find projects in my neighborhood. I've
+              "KindLink made it incredibly easy to find projects in my neighborhood. I've
               met amazing people and helped plant over 100 trees!"
             </p>
             <footer className="text-xs font-semibold tracking-wider uppercase text-muted-foreground/80">
@@ -95,7 +95,7 @@ function AuthPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
               <Heart className="h-5 w-5" fill="currentColor" />
             </div>
-            <span className="font-display font-bold text-xl tracking-tight">VolunteerConnect</span>
+            <span className="font-display font-bold text-xl tracking-tight">KindLink</span>
           </div>
 
           <div className="space-y-2 mb-8">

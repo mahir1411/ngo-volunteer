@@ -16,13 +16,13 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "VolunteerConnect — Connect nonprofits with volunteers" },
+      { title: "KindLink — Connect nonprofits with volunteers" },
       {
         name: "description",
         content:
           "Find volunteer events near you or post opportunities for your nonprofit. Geo-radius search, instant signup, and certificates that travel with you.",
       },
-      { property: "og:title", content: "VolunteerConnect" },
+      { property: "og:title", content: "KindLink" },
       { property: "og:description", content: "Connect nonprofits with volunteers — instantly." },
     ],
   }),
@@ -194,7 +194,7 @@ function Landing() {
       {/* Footer */}
       <footer className="border-t border-border/40 py-10 bg-background/50 text-xs text-muted-foreground">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <div>© {new Date().getFullYear()} VolunteerConnect. All rights reserved.</div>
+          <div>© {new Date().getFullYear()} KindLink. All rights reserved.</div>
           <div className="flex items-center gap-1.5">
             <Heart className="h-4 w-4 text-accent animate-pulse" fill="currentColor" /> Bridging
             community needs

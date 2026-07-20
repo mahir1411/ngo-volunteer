@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Mail, Phone, X } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/volunteer/applications")({
-  head: () => ({ meta: [{ title: "My applications — VolunteerConnect" }] }),
+  head: () => ({ meta: [{ title: "My applications — KindLink" }] }),
   component: Apps,
 });
 

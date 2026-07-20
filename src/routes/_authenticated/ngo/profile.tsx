@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_authenticated/ngo/profile")({
-  head: () => ({ meta: [{ title: "NGO profile — VolunteerConnect" }] }),
+  head: () => ({ meta: [{ title: "NGO profile — KindLink" }] }),
   component: NgoProfile,
 });
 

@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const Route = createFileRoute("/_authenticated/ngo/events/$id/edit")({
-  head: () => ({ meta: [{ title: "Edit event — VolunteerConnect" }] }),
+  head: () => ({ meta: [{ title: "Edit event — KindLink" }] }),
   component: EditEvent,
 });
 

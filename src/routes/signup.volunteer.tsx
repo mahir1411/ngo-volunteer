@@ -12,8 +12,8 @@ import { Heart } from "lucide-react";
 export const Route = createFileRoute("/signup/volunteer")({
   head: () => ({
     meta: [
-      { title: "Volunteer sign up — VolunteerConnect" },
-      { name: "description", content: "Create a volunteer account on VolunteerConnect." },
+      { title: "Volunteer sign up — KindLink" },
+      { name: "description", content: "Create a volunteer account on KindLink." },
     ],
   }),
   component: SignupVolunteer,
@@ -103,7 +103,7 @@ function SignupVolunteer() {
               <Heart className="h-4.5 w-4.5" fill="currentColor" />
             </div>
             <span className="font-display font-bold text-lg tracking-tight text-foreground">
-              VolunteerConnect
+              KindLink
             </span>
           </Link>
         </div>
@@ -169,7 +169,7 @@ function SignupVolunteer() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
               <Heart className="h-5 w-5" fill="currentColor" />
             </div>
-            <span className="font-display font-bold text-xl tracking-tight">VolunteerConnect</span>
+            <span className="font-display font-bold text-xl tracking-tight">KindLink</span>
           </div>
 
           <div className="space-y-2 mb-8">

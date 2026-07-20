@@ -15,7 +15,7 @@ import { issueCertificate } from "@/lib/certificate.functions";
 import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/ngo/events/$id/applicants")({
-  head: () => ({ meta: [{ title: "Applicants — VolunteerConnect" }] }),
+  head: () => ({ meta: [{ title: "Applicants — KindLink" }] }),
   component: Applicants,
 });
 
@@ -858,7 +858,7 @@ function AttendanceTableRow({ a, refetch, issue, ev }: any) {
         font: body,
         color: ink,
       });
-      page.drawText(`VolunteerConnect  -  ${new Date().toDateString()}`, {
+      page.drawText(`KindLink  -  ${new Date().toDateString()}`, {
         x: 520,
         y: 80,
         size: 10,

@@ -9,7 +9,7 @@ import { signedUrl } from "@/lib/storage-url";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/volunteer/certificates")({
-  head: () => ({ meta: [{ title: "Certificates — VolunteerConnect" }] }),
+  head: () => ({ meta: [{ title: "Certificates — KindLink" }] }),
   component: Certificates,
 });
 

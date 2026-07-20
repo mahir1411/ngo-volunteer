@@ -97,7 +97,7 @@ export const issueCertificate = createServerFn({ method: "POST" })
       font: body,
       color: ink,
     });
-    page.drawText(`VolunteerConnect  -  ${new Date().toDateString()}`, {
+    page.drawText(`KindLink  -  ${new Date().toDateString()}`, {
       x: 520,
       y: 80,
       size: 10,

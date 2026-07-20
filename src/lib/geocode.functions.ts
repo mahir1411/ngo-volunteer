@@ -17,7 +17,7 @@ export const geocodeAddress = createServerFn({ method: "POST" })
     try {
       const res = await fetch(url, {
         headers: {
-          "User-Agent": "VolunteerConnect/1.0 (volunteer-portal)",
+          "User-Agent": "KindLink/1.0 (volunteer-portal)",
           "Accept-Language": "en",
         },
       });

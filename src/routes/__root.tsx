@@ -91,14 +91,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "VolunteerConnect — Find your next volunteer opportunity" },
+      { title: "KindLink — Find your next volunteer opportunity" },
       {
         name: "description",
         content:
-          "Discover NGO events near you and contribute your time and skills. VolunteerConnect bridges nonprofits and volunteers.",
+          "Discover NGO events near you and contribute your time and skills. KindLink bridges nonprofits and volunteers.",
       },
-      { name: "author", content: "VolunteerConnect" },
-      { property: "og:title", content: "VolunteerConnect" },
+      { name: "author", content: "KindLink" },
+      { property: "og:title", content: "KindLink" },
       {
         property: "og:description",
         content: "Connect with nonprofits, apply to events near you, and track your impact.",

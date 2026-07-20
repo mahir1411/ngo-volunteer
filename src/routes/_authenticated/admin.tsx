@@ -22,7 +22,7 @@ import { signedUrl } from "@/lib/storage-url";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  head: () => ({ meta: [{ title: "Admin — VolunteerConnect" }] }),
+  head: () => ({ meta: [{ title: "Admin — KindLink" }] }),
   beforeLoad: async () => {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) throw redirect({ to: "/auth" });

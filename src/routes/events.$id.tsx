@@ -33,8 +33,8 @@ import {
 export const Route = createFileRoute("/events/$id")({
   head: ({ params }) => ({
     meta: [
-      { title: "Event details — VolunteerConnect" },
-      { name: "description", content: `Event ${params.id} on VolunteerConnect.` },
+      { title: "Event details — KindLink" },
+      { name: "description", content: `Event ${params.id} on KindLink.` },
     ],
   }),
   component: EventDetail,

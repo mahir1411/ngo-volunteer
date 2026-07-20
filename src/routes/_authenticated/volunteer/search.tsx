@@ -31,7 +31,7 @@ const CATEGORIES = [
 ];
 
 export const Route = createFileRoute("/_authenticated/volunteer/search")({
-  head: () => ({ meta: [{ title: "Find events near you — VolunteerConnect" }] }),
+  head: () => ({ meta: [{ title: "Find events near you — KindLink" }] }),
   component: VolunteerSearch,
 });
 
