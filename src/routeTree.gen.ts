@@ -9,29 +9,33 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as BrowseRouteImport } from './routes/browse'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SignupVolunteerRouteImport } from './routes/signup.volunteer'
-import { Route as SignupNgoRouteImport } from './routes/signup.ngo'
-import { Route as EventsIdRouteImport } from './routes/events.$id'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as BrowseRouteImport } from './routes/browse'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as AuthenticatedVolunteerSearchRouteImport } from './routes/_authenticated/volunteer/search'
-import { Route as AuthenticatedVolunteerProfileRouteImport } from './routes/_authenticated/volunteer/profile'
-import { Route as AuthenticatedVolunteerCertificatesRouteImport } from './routes/_authenticated/volunteer/certificates'
-import { Route as AuthenticatedVolunteerApplicationsRouteImport } from './routes/_authenticated/volunteer/applications'
-import { Route as AuthenticatedNgoProfileRouteImport } from './routes/_authenticated/ngo/profile'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as EventsIdRouteImport } from './routes/events.$id'
+import { Route as SignupNgoRouteImport } from './routes/signup.ngo'
+import { Route as SignupVolunteerRouteImport } from './routes/signup.volunteer'
 import { Route as AuthenticatedNgoEventsRouteImport } from './routes/_authenticated/ngo/events'
+import { Route as AuthenticatedNgoProfileRouteImport } from './routes/_authenticated/ngo/profile'
+import { Route as AuthenticatedVolunteerApplicationsRouteImport } from './routes/_authenticated/volunteer/applications'
+import { Route as AuthenticatedVolunteerCertificatesRouteImport } from './routes/_authenticated/volunteer/certificates'
+import { Route as AuthenticatedVolunteerProfileRouteImport } from './routes/_authenticated/volunteer/profile'
+import { Route as AuthenticatedVolunteerSearchRouteImport } from './routes/_authenticated/volunteer/search'
 import { Route as AuthenticatedNgoEventsIndexRouteImport } from './routes/_authenticated/ngo/events.index'
 import { Route as AuthenticatedNgoEventsNewRouteImport } from './routes/_authenticated/ngo/events.new'
-import { Route as AuthenticatedNgoEventsIdEditRouteImport } from './routes/_authenticated/ngo/events.$id.edit'
 import { Route as AuthenticatedNgoEventsIdApplicantsRouteImport } from './routes/_authenticated/ngo/events.$id.applicants'
+import { Route as AuthenticatedNgoEventsIdEditRouteImport } from './routes/_authenticated/ngo/events.$id.edit'
 
-const BrowseRoute = BrowseRouteImport.update({
-  id: '/browse',
-  path: '/browse',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -39,18 +43,24 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
+const BrowseRoute = BrowseRouteImport.update({
+  id: '/browse',
+  path: '/browse',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const SignupVolunteerRoute = SignupVolunteerRouteImport.update({
-  id: '/signup/volunteer',
-  path: '/signup/volunteer',
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const EventsIdRoute = EventsIdRouteImport.update({
+  id: '/events/$id',
+  path: '/events/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignupNgoRoute = SignupNgoRouteImport.update({
@@ -58,31 +68,25 @@ const SignupNgoRoute = SignupNgoRouteImport.update({
   path: '/signup/ngo',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EventsIdRoute = EventsIdRouteImport.update({
-  id: '/events/$id',
-  path: '/events/$id',
+const SignupVolunteerRoute = SignupVolunteerRouteImport.update({
+  id: '/signup/volunteer',
+  path: '/signup/volunteer',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const AuthenticatedNgoEventsRoute = AuthenticatedNgoEventsRouteImport.update({
+  id: '/ngo/events',
+  path: '/ngo/events',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const AuthenticatedNgoProfileRoute = AuthenticatedNgoProfileRouteImport.update({
+  id: '/ngo/profile',
+  path: '/ngo/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedVolunteerSearchRoute =
-  AuthenticatedVolunteerSearchRouteImport.update({
-    id: '/volunteer/search',
-    path: '/volunteer/search',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedVolunteerProfileRoute =
-  AuthenticatedVolunteerProfileRouteImport.update({
-    id: '/volunteer/profile',
-    path: '/volunteer/profile',
+const AuthenticatedVolunteerApplicationsRoute =
+  AuthenticatedVolunteerApplicationsRouteImport.update({
+    id: '/volunteer/applications',
+    path: '/volunteer/applications',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedVolunteerCertificatesRoute =
@@ -91,22 +95,18 @@ const AuthenticatedVolunteerCertificatesRoute =
     path: '/volunteer/certificates',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedVolunteerApplicationsRoute =
-  AuthenticatedVolunteerApplicationsRouteImport.update({
-    id: '/volunteer/applications',
-    path: '/volunteer/applications',
+const AuthenticatedVolunteerProfileRoute =
+  AuthenticatedVolunteerProfileRouteImport.update({
+    id: '/volunteer/profile',
+    path: '/volunteer/profile',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedNgoProfileRoute = AuthenticatedNgoProfileRouteImport.update({
-  id: '/ngo/profile',
-  path: '/ngo/profile',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedNgoEventsRoute = AuthenticatedNgoEventsRouteImport.update({
-  id: '/ngo/events',
-  path: '/ngo/events',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
+const AuthenticatedVolunteerSearchRoute =
+  AuthenticatedVolunteerSearchRouteImport.update({
+    id: '/volunteer/search',
+    path: '/volunteer/search',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedNgoEventsIndexRoute =
   AuthenticatedNgoEventsIndexRouteImport.update({
     id: '/',
@@ -119,16 +119,16 @@ const AuthenticatedNgoEventsNewRoute =
     path: '/new',
     getParentRoute: () => AuthenticatedNgoEventsRoute,
   } as any)
-const AuthenticatedNgoEventsIdEditRoute =
-  AuthenticatedNgoEventsIdEditRouteImport.update({
-    id: '/$id/edit',
-    path: '/$id/edit',
-    getParentRoute: () => AuthenticatedNgoEventsRoute,
-  } as any)
 const AuthenticatedNgoEventsIdApplicantsRoute =
   AuthenticatedNgoEventsIdApplicantsRouteImport.update({
     id: '/$id/applicants',
     path: '/$id/applicants',
+    getParentRoute: () => AuthenticatedNgoEventsRoute,
+  } as any)
+const AuthenticatedNgoEventsIdEditRoute =
+  AuthenticatedNgoEventsIdEditRouteImport.update({
+    id: '/$id/edit',
+    path: '/$id/edit',
     getParentRoute: () => AuthenticatedNgoEventsRoute,
   } as any)
 
@@ -268,18 +268,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/browse': {
-      id: '/browse'
-      path: '/browse'
-      fullPath: '/browse'
-      preLoaderRoute: typeof BrowseRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -289,18 +282,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/signup/volunteer': {
-      id: '/signup/volunteer'
-      path: '/signup/volunteer'
-      fullPath: '/signup/volunteer'
-      preLoaderRoute: typeof SignupVolunteerRouteImport
+    '/browse': {
+      id: '/browse'
+      path: '/browse'
+      fullPath: '/browse'
+      preLoaderRoute: typeof BrowseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/events/$id': {
+      id: '/events/$id'
+      path: '/events/$id'
+      fullPath: '/events/$id'
+      preLoaderRoute: typeof EventsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signup/ngo': {
@@ -310,53 +324,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupNgoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/events/$id': {
-      id: '/events/$id'
-      path: '/events/$id'
-      fullPath: '/events/$id'
-      preLoaderRoute: typeof EventsIdRouteImport
+    '/signup/volunteer': {
+      id: '/signup/volunteer'
+      path: '/signup/volunteer'
+      fullPath: '/signup/volunteer'
+      preLoaderRoute: typeof SignupVolunteerRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/volunteer/search': {
-      id: '/_authenticated/volunteer/search'
-      path: '/volunteer/search'
-      fullPath: '/volunteer/search'
-      preLoaderRoute: typeof AuthenticatedVolunteerSearchRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/volunteer/profile': {
-      id: '/_authenticated/volunteer/profile'
-      path: '/volunteer/profile'
-      fullPath: '/volunteer/profile'
-      preLoaderRoute: typeof AuthenticatedVolunteerProfileRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/volunteer/certificates': {
-      id: '/_authenticated/volunteer/certificates'
-      path: '/volunteer/certificates'
-      fullPath: '/volunteer/certificates'
-      preLoaderRoute: typeof AuthenticatedVolunteerCertificatesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/volunteer/applications': {
-      id: '/_authenticated/volunteer/applications'
-      path: '/volunteer/applications'
-      fullPath: '/volunteer/applications'
-      preLoaderRoute: typeof AuthenticatedVolunteerApplicationsRouteImport
+    '/_authenticated/ngo/events': {
+      id: '/_authenticated/ngo/events'
+      path: '/ngo/events'
+      fullPath: '/ngo/events'
+      preLoaderRoute: typeof AuthenticatedNgoEventsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/ngo/profile': {
@@ -366,11 +345,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNgoProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/ngo/events': {
-      id: '/_authenticated/ngo/events'
-      path: '/ngo/events'
-      fullPath: '/ngo/events'
-      preLoaderRoute: typeof AuthenticatedNgoEventsRouteImport
+    '/_authenticated/volunteer/applications': {
+      id: '/_authenticated/volunteer/applications'
+      path: '/volunteer/applications'
+      fullPath: '/volunteer/applications'
+      preLoaderRoute: typeof AuthenticatedVolunteerApplicationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/volunteer/certificates': {
+      id: '/_authenticated/volunteer/certificates'
+      path: '/volunteer/certificates'
+      fullPath: '/volunteer/certificates'
+      preLoaderRoute: typeof AuthenticatedVolunteerCertificatesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/volunteer/profile': {
+      id: '/_authenticated/volunteer/profile'
+      path: '/volunteer/profile'
+      fullPath: '/volunteer/profile'
+      preLoaderRoute: typeof AuthenticatedVolunteerProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/volunteer/search': {
+      id: '/_authenticated/volunteer/search'
+      path: '/volunteer/search'
+      fullPath: '/volunteer/search'
+      preLoaderRoute: typeof AuthenticatedVolunteerSearchRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/ngo/events/': {
@@ -387,18 +387,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNgoEventsNewRouteImport
       parentRoute: typeof AuthenticatedNgoEventsRoute
     }
-    '/_authenticated/ngo/events/$id/edit': {
-      id: '/_authenticated/ngo/events/$id/edit'
-      path: '/$id/edit'
-      fullPath: '/ngo/events/$id/edit'
-      preLoaderRoute: typeof AuthenticatedNgoEventsIdEditRouteImport
-      parentRoute: typeof AuthenticatedNgoEventsRoute
-    }
     '/_authenticated/ngo/events/$id/applicants': {
       id: '/_authenticated/ngo/events/$id/applicants'
       path: '/$id/applicants'
       fullPath: '/ngo/events/$id/applicants'
       preLoaderRoute: typeof AuthenticatedNgoEventsIdApplicantsRouteImport
+      parentRoute: typeof AuthenticatedNgoEventsRoute
+    }
+    '/_authenticated/ngo/events/$id/edit': {
+      id: '/_authenticated/ngo/events/$id/edit'
+      path: '/$id/edit'
+      fullPath: '/ngo/events/$id/edit'
+      preLoaderRoute: typeof AuthenticatedNgoEventsIdEditRouteImport
       parentRoute: typeof AuthenticatedNgoEventsRoute
     }
   }

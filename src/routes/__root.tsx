@@ -6,6 +6,7 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
@@ -33,31 +34,32 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
-  console.error(error);
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
+  const err = error instanceof Error ? error : new Error(String(error));
+  console.error(err);
   const router = useRouter();
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
+    reportLovableError(err, { boundary: "tanstack_root_error_component" });
+  }, [err]);
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="max-w-xl text-center">
         <h1 className="font-display text-2xl font-semibold">Something went wrong</h1>
         <p className="mt-2 text-sm text-muted-foreground">We hit a snag loading this page.</p>
         
-        {error && (
+        {err && (
           <div className="mt-4 p-4 text-left bg-destructive/10 border border-destructive/20 rounded-xl max-h-60 overflow-auto">
             <p className="text-sm font-semibold text-destructive">Error Message:</p>
             <p className="text-xs font-mono text-muted-foreground mt-1 break-all whitespace-pre-wrap animate-fade-in">
-              {error.message || String(error)}
+              {err.message || String(err)}
             </p>
-            {error.stack && (
+            {err.stack && (
               <details className="mt-2">
                 <summary className="text-xs text-muted-foreground cursor-pointer hover:underline font-semibold">
                   Show stack trace
                 </summary>
                 <p className="text-[10px] font-mono text-muted-foreground mt-2 leading-relaxed whitespace-pre overflow-x-auto">
-                  {error.stack}
+                  {err.stack}
                 </p>
               </details>
             )}
@@ -68,7 +70,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           <button
             onClick={() => {
               router.invalidate();
-              reset();
+              reset?.();
             }}
             className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground cursor-pointer"
           >
