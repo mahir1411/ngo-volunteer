@@ -68,7 +68,10 @@ function SignupNgo() {
     });
     if (error || !data.user) {
       setBusy(false);
-      toast.error(error?.message || "Signup failed");
+      const msg = error?.message?.includes("Failed to fetch")
+        ? "Network error: Cannot reach Supabase backend. Please check your network or ad-blocker."
+        : error?.message || "Signup failed";
+      toast.error(msg);
       return;
     }
     const uid = data.user.id;

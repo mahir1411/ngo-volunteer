@@ -27,14 +27,28 @@ function AuthPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setBusy(false);
-    if (error) {
-      toast.error(error.message);
-      return;
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      setBusy(false);
+      if (error) {
+        if (
+          error.message?.includes("Failed to fetch") ||
+          error.name === "AuthRetryableFetchError"
+        ) {
+          toast.error(
+            "Network error: Cannot reach Supabase backend. Please check your internet, disable ad-blockers, or verify project settings.",
+          );
+        } else {
+          toast.error(error.message);
+        }
+        return;
+      }
+      toast.success("Welcome back!");
+      nav({ to: "/dashboard" });
+    } catch (err: any) {
+      setBusy(false);
+      toast.error(err?.message || "Login failed. Please try again.");
     }
-    toast.success("Welcome back!");
-    nav({ to: "/dashboard" });
   };
 
   return (
