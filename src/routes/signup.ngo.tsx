@@ -68,9 +68,12 @@ function SignupNgo() {
     });
     if (error || !data.user) {
       setBusy(false);
-      const msg = error?.message?.includes("Failed to fetch")
-        ? "Network error: Cannot reach Supabase backend. Please check your network or ad-blocker."
-        : error?.message || "Signup failed";
+      let msg = error?.message || "Signup failed";
+      if (error?.message?.includes("Failed to fetch")) {
+        msg = "Network error: Cannot reach Supabase backend. Please check your network or ad-blocker.";
+      } else if (error?.message?.toLowerCase().includes("rate limit")) {
+        msg = "Email rate limit reached: Please disable 'Confirm email' in Supabase Dashboard (Auth → Providers → Email) for unlimited instant signups.";
+      }
       toast.error(msg);
       return;
     }
